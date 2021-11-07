@@ -1,4 +1,4 @@
-# Generic Event Framework Use Case
+# Generic Event Framework
 
 ## Objective
 
