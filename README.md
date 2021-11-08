@@ -31,7 +31,6 @@ MES records events related to process order status changes, batch events, stock 
 ## __Architecture Review__
 ---
 
-
 ### 1. Synchronous Communication
 ---
 
@@ -60,25 +59,42 @@ Typically in software systems, these conversations are modelled using request / 
 * Latency (Dependency)
 * Non-Durable - Consumer needs to be actively listening for requests
 
+It is not possible that all the consumers will be online at all times. It would either mean that the event producer will have to wait for all the consumers to be online or accept the fact that some consumers (which were offline) will miss the message. For a reliable event based system, this is not acceptable. Losing a status change message or Batch created event would be a big issue for external systems.
+
 ### 2. Asynchronous Communication
 ---
 
+Keeping both the parties in communication active is not possible all the time. In such an event there is a loss of information or the request needs to wait till the time both the parties are able to talk to each other.
+
+Asynchronous communication allows the parties to not actively listen for messages. Instead they can when send or receive messages based on their convenience. The sender does not expect to receive response immediately. Rather it can be processed at the receiver end when the receiver is free to process it. This allows the two parties to be loosely coupled or dependent on each other.
+
+This is mostly achieved using some queue mechanism like MSMQ, SQS, NServicebus, RabbitMQ etc where the sender sends the message to the queue and receiver either queries or receives the message from the queue.
 
 ![](src/images/AsynchronousCommunication.png)
 
+Such a durable form of communication is ideal in the case of 1:1 producer / consumer scenario where the broker can retry message to the consumer in case it is offline.
+
+For a multi consumer scenario, this becomes complex as the broker needs to determine which consumers received the message and which did not receive the message. In this case, the broker needs to make a decision if the message needs to be retried for the failed consumers or forget the message causing loss of message for the failed consumers.
+
 ![](src/images/AsynchronousCommunication_Issue.png)
+
+Managing state of message delivery though possible is complex. Losing messages is not as per requirement and hence retrying is the only option. For retrying, the message will need to be queued again in the system for specific consumers. These messages will move to the back of the queue and cause incorrect order of messages being received at the consumer.
 
 #### PROS
 
-*
-*
-*
+* Loosely coupled
+* No Wait or Producer of events
+* No Blocking of producer for sending events
+* Durable communication
+* Low Latency
 
 #### CONS
 
-*
-*
-*
+* Queue Based (Order not guaranteed)
+* Decision for handling disconnections
+* Manage retry / repeat for specific consumers
+* Ability to overwhelm consumers
+* Ideal for message processing rather than event framework
 
 ### 3. Push vs Pull
 ---
