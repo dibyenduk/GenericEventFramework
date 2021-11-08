@@ -35,19 +35,30 @@ MES records events related to process order status changes, batch events, stock 
 ### 1. Synchronous Communication
 ---
 
+In synchronous communication both the parties in the communication actively have an established channel and communicate over it with each other. 
+
+In this case both the parties need to be continously listening over the channel and cannot disconnect and resume on a later point in time. 
+
+This is more like a human to human interaction where both human need to be present for a conversation. One human requests for some information or provides some information and the other person responds with the information or acknowledges that he / she received the information.
+
+Typically in software systems, these conversations are modelled using request / response based services like WCF (Windows Communication Foundation), RPC, Web APIs etc
+
 ![](src/images/SynchronousCommunication.png)
 
 #### PROS
 
-*
-*
-*
+* Simple request / response based services
+* Easy to develop, standardized .NET tools for creating services, widely used
+* Easy to visualize, debug and direct communication
+* Ideal for non-durable communication
 
 #### CONS
 
-*
-*
-*
+* Tightly Coupled
+* Wait time for consumer to accept, process and respond to request
+* Blocking
+* Latency (Dependency)
+* Non-Durable - Consumer needs to be actively listening for requests
 
 ### 2. Asynchronous Communication
 ---
