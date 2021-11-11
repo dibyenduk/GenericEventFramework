@@ -1,4 +1,4 @@
-# Generic Event Framework
+# Event Framework
 
 ## __Objective__
 
@@ -18,7 +18,7 @@ MES application sits between the L2 layer like SCADA (Supervisory control and da
 
 ## __Problem__
 
-MES is an enterprise application which keeps track of all the activity on the plant floor. This information is stored in 3M MES database and can be fetched by other systems only through the mechanism of REST based web services.
+MES is an enterprise application which keeps track of all the activity on the plant floor. This information is stored in MES database and can be fetched by other systems only through the mechanism of REST based web services.
 
 External systems need to poll the MES application for any changes that have happened in the system. This causes a large amount of API calls to the MES system just to get information for any changes in the system.
 
@@ -99,36 +99,67 @@ Managing state of message delivery though possible is complex. Losing messages i
 ### 3. Push vs Pull
 ---
 
+Another aspect to consider for the architecture would be whether to push events to the consumers or let the consumers pull the information from the source.
+
+**Push Based System**
+
+A push based system allows the events / data to be pushed downstream towards the consumers. This allows the consumers to receive the events in real time when the events occur. 
+
+The idea is that all the consumers will be able to receive the events at the same time and at the same speed and process them. Unfortunately in a real scenario, not all consumers can accept and process the events at the same pace. Sending events to all consumers can make the consumers overwhelmed if the rate of event production is greater than the rate of consumption.
+
 ![](src/images/Push.png)
 
 #### PROS
 
-*
-*
-*
+* Light consumers.
 
 #### CONS
 
-*
-*
-*
+* Overload consumers
+* Strict API / Configuration for consumers.
+* Managing retry / repeat on consumer disconnection.
+* Loop across all consumers to push data.
+* Multiple points of failure.
+
+**Push Based System**
+
+A pull based system allows the producer to push events to a broker but lets the consumers get the events from broker. This allows fast / slow consumers to process the events at their own pace. If a consumer disconnects then it can just process the event from where it left. This allows the consumer to safely disconnect without losing a single event message. Other consumers are not affected by one consumer getting disconnect and can process the information. Consumers also having the benefit to receive events in batches to avoid unnecessary poll cycles.
+
+There is no need for strict standardization of consumer APIs nor is there a need for configuration of the consumers. It is possible to start consumers at will and let them subscribe for the events generated from the master system.
 
 ![](src/images/Pull.png)
 
 #### PROS
 
-*
-*
-*
+* No Denial of Service for consumers.
+* No API / Configuration needed.
+* Dynamic consumer addition.
+* Easy to handle disconnection.
+* Loose coupling. One consumers disconnection does not affect other consumers.
+* Allow batching of pull data.
 
 #### CONS
 
+* Consumers need to read data (Not acceptable to a lot of customers).
+* Need SDK / Code for all languages to read the data.
+* Need to continous poll for data from broker.
+* Empty calls / CPU Util for loops.
+* Need to maintain last read state for individual consumers.
+* Scaling and Fault tolerance needed.
 
-*
-*
-*
+## __Product Selection__
 
-## __Product Selection - Apache Kafka__
+The initial thought process was to have a simple NServicebus based Windows service with a backend SQL Server queue based table. This Queue would store all the events generated in MES. 
+
+The NServiceBus based windows service will get messages one by one from the queue and send the messages to the consumers through a standard REST API call. Every consumer would need to expose a web service and that will be configured in MES using a new configuration screen. MES will have a lot of events and hence this screen would need to be able to configure endpoints for all these events.
+
+Scale can be achieved by having multiple queues for individual event types and multiple services to process the events. Fault tolerance could be achieved by deploying these services on different servers so even if one of the service is down, it would not affect the system.
+
+One of the biggest drawback of this mechanism was to identify how to handle one or two consumers going down or getting disconnected. 
+
+Should we retry the messages ? Would the messages go back to the back of the queue ? How will the ordering of messages be handled in such as situation as ordering is important ? Should we stop processing the messages till all the consumers are up ? 
+
+[](src/images/AsynchronousCommunication_Issue.png)
 
 ## __Architecture and Components__
 
