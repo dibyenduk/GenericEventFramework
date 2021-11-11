@@ -159,7 +159,11 @@ One of the biggest drawback of this mechanism was to identify how to handle one 
 
 Should we retry the messages ? Would the messages go back to the back of the queue ? How will the ordering of messages be handled in such as situation as ordering is important ? Should we stop processing the messages till all the consumers are up ? 
 
-[](src/images/AsynchronousCommunication_Issue.png)
+This looks ideal for a message processing system but does not seem fit for an event based system.
+
+A pull based framework like Apache Kafka suits better for an event processing system as it can caters to diverse consumers. Each consumer can get data and catch up when it can without getting overwhelmed by the amount of events it receives. 
+
+Kafka also allows batching of multiple events that can be fetched with one pull. This allows reducing the number of polls required to get the data. One advantage that Kafka provides is in terms of long polling where it does not do empty polling when there is no data in the broker but rather blocks till the time any new messages are received. Scaling and fault tolerance is achieved seamlessly using the addition of cluster nodes.
 
 ## __Architecture and Components__
 
