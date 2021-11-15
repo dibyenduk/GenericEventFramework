@@ -171,7 +171,8 @@ Kafka also allows batching of multiple events that can be fetched with one pull.
 
 ## __Implementation__
 
-**Apache Kafka**
+### **1. Apache Kafka**
+---
 
 1. Install JRE
     * Download [JRE](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
@@ -203,7 +204,7 @@ Kafka also allows batching of multiple events that can be fetched with one pull.
     * Extract it as C:\kafka_2.12-2.5.0
     * Edit server.properties in C:\kafka_2.12-2.5.0\config folder
     * Edit log.dirs = ../kafka-logs/
-    * Kafka will run on defaul port 9092 and connect to zookeeper at 2181.
+    * Kafka will run on default port 9092 and connect to zookeeper at 2181.
     * Run .\bin\windows\kafka-server-start.bat .\config\server.properties in command window.
     * Kafka will run as follows -
 
@@ -225,5 +226,18 @@ Kafka also allows batching of multiple events that can be fetched with one pull.
 
         ![](src/images/Consumer.png)
         
-(Courtesy - [dzone](https://dzone.com/articles/running-apache-kafka-on-windows-os) )
+
+**Useful Commands -**
+1. List Topics: kafka-topics.bat --list --zookeeper localhost:2181 
+2. Describe Topic: kafka-topics.bat --describe --zookeeper localhost:2181 --topic dktest
+3. Read messages from the beginning
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic dktest --from-beginning
+4. Delete Topic: kafka-run-class.bat kafka.admin.TopicCommand --delete --topic dktest --zookeeper localhost:2181
+
+Referred Article: [dzone](https://dzone.com/articles/running-apache-kafka-on-windows-os)
+
+### **2. Confluent Docker Image**
+---
+
+* TBD
 
