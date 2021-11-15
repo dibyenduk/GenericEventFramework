@@ -197,7 +197,7 @@ Kafka also allows batching of multiple events that can be fetched with one pull.
     * Run Zookeeper with cmd -> zkserver
     * It will run on default port 2181.
 
-        ![](src/images/ZooKeeper.png)
+        ![](src/images/Zookeeper.png)
 
 3. Setup Kafka
     * Download [Kafka](http://kafka.apache.org/downloads.html)
