@@ -121,7 +121,7 @@ The idea is that all the consumers will be able to receive the events at the sam
 * Loop across all consumers to push data.
 * Multiple points of failure.
 
-**Push Based System**
+**Pull Based System**
 
 A pull based system allows the producer to push events to a broker but lets the consumers get the events from broker. This allows fast / slow consumers to process the events at their own pace. If a consumer disconnects then it can just process the event from where it left. This allows the consumer to safely disconnect without losing a single event message. Other consumers are not affected by one consumer getting disconnect and can process the information. Consumers also having the benefit to receive events in batches to avoid unnecessary poll cycles.
 
@@ -239,5 +239,4 @@ Referred Article: [dzone](https://dzone.com/articles/running-apache-kafka-on-win
 ### **2. Confluent Docker Image**
 ---
 
-* TBD
-
+TBD
