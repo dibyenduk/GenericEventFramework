@@ -171,6 +171,59 @@ Kafka also allows batching of multiple events that can be fetched with one pull.
 
 ## __Implementation__
 
-1. Apache Kafka
+**Apache Kafka**
 
-2. Confluent Docker image
+1. Install JRE
+    * Download [JRE](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
+    * Start JRE Installation. Select "Change Destination folder" and click install.
+ 
+    * Change path to a folder without spaces. Mine is C:\Java\jre1.8.0_251
+
+    * Run Win+R/sysdm.cpl and open the Environment variables from Advanced tab. 
+        - Create User variable JAVA_HOME = C:\Java\jre1.8.0_251
+        - Append to System variable PATH - ;%JAVA_HOME%\bin  
+
+    * Type java --version and see if the version shows up.
+
+2. Install Zookeeper
+
+    * Download [Zookeeper](http://zookeeper.apache.org/releases.html)
+    * Extract it as C:\zookeeper-3.6.1
+    * In Zookeeper config directory (C:\zookeeper-3.6.1\bin), rename zoo_sample.cfg to zoo.cfg
+    * Edit zoo.cfg in Notepad++. Update dataDir=/tmp/zookeeper to dataDir=../bin/data
+    * Add ZOOKEEPER_HOME = C:\zookeeper-3.6.1 to the System Variables in Environment variables
+    * Append System Variable Path - ;%ZOOKEEPER_HOME%\bin;
+    * Run Zookeeper with cmd -> zkserver
+    * It will run on default port 2181.
+
+        ![](src/images/ZooKeeper.png)
+
+3. Setup Kafka
+    * Download [Kafka](http://kafka.apache.org/downloads.html)
+    * Extract it as C:\kafka_2.12-2.5.0
+    * Edit server.properties in C:\kafka_2.12-2.5.0\config folder
+    * Edit log.dirs = ../kafka-logs/
+    * Kafka will run on defaul port 9092 and connect to zookeeper at 2181.
+    * Run .\bin\windows\kafka-server-start.bat .\config\server.properties in command window.
+    * Kafka will run as follows -
+
+        ![](src/images/Kafka_Start.png)
+
+4. Create Topic
+   * cd c:\kafka_2.12-2.5.0\bin\windows\
+   * Run command - kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic dktest
+
+        ![](src/images/Topic-Create.png)
+
+5. Test Producer and Consumer
+    * cd c:\kafka_2.12-2.5.0\bin\windows\
+    * Producer : Run command - kafka-console-producer.bat --broker-list localhost:9092 --topic dktest
+
+        ![](src/images/Producer.png)
+
+    * Consumer : Run command - kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic dktest
+
+        ![](src/images/Consumer.png)
+        
+(Courtesy - [dzone](https://dzone.com/articles/running-apache-kafka-on-windows-os) )
+
