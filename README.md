@@ -236,7 +236,56 @@ kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic dktest --fr
 
 Referred Article: [dzone](https://dzone.com/articles/running-apache-kafka-on-windows-os)
 
-### **2. Confluent Docker Image**
+### **2. Confluent Docker Image, KStreams and KSqlDB**
 ---
 
-TBD
+1. Download [docker-compose.yml](https://github.com/dibyenduk/GenericEventFramework/blob/main/src/docker-compose/docker-compose.yml) in folder e.g C:\kafka-all-in-one\
+2. Open Command prompt and run command - docker-compose up -d
+
+   ![](src/images/Docker-Compose.png)
+
+3. Open http://localhost:9021/ to open control center
+
+   ![](src/images/ControlCenter.png)
+
+4. Create a new topic changestatus
+
+   ![](src/images/CreateTopic_ChangeStatus.png)    
+
+5. Open command prompt and produce MES events to changestatus topic.
+
+   ![](src/images/Docker_ProduceChangeStatus.png)
+
+   ![](src/images/ControlCenter_TopicMessageReceived.png)
+   
+6. Create a changestatus stream on changestatus topic.
+
+   ![](src/images/ChangeStatus_Stream.png)
+
+7. Produce to changestatus topic. Events should show up in changestatus stream.
+
+   ![](src/images/ChangeStatusStreamMessage.png)
+
+8. Create a new stream changestatus_active_pause by running command -
+
+       CREATE STREAM changestatus_active_pause WITH kafka_topic = 'changestatus_active_pause', partitions = 1) AS SELECT PlantCode, WorkCenter, ProcessOrderNbr, OperationNbr, FromStatus, ToStatus, Comment from changestatus where FromStatus='ACTIVE';
+
+    ![](src/images/CreateStream_ChangeStatus_Active_Paused.png)
+    
+9. Produce events to change status topic.
+
+    ![](src/images/ChangeStatusStream_Active_Paused_Producer2.png)
+
+10. Create sample consumer application to consume events from changestatus and changestatus_active_pause topics. 
+
+    ![](src/images/TestConsumerApp.png)
+
+11. ChangeStatus Topic -
+
+    ![](src/images/ChangeStatus_TestConsumer.png)
+
+12. ChangeStatus_Active_Paused Topic with filtered data -
+
+    ![](src/images/ChangeStatus_Active_Pause_TestConsumer.png)
+
+The changestatus topic will have all the events created in MES but the changestatus_active_pause will only have the events where FromStatus = 'ACTIVE'. This allows consumers to consume only events that they subscribe. The producer will send all the events to changestatus topic.    
